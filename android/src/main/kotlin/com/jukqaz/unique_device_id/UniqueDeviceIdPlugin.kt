@@ -45,7 +45,7 @@ class UniqueDeviceIdPlugin : FlutterPlugin, MethodCallHandler {
     }
 
     private fun getUniqueId(): String? {
-        var uniqueId: String? = ""//getAndroidId()
+        var uniqueId: String? = getAndroidId()
         if (uniqueId?.isBlank() == true) {
             if (!useInternalStorageForAndroid) return null
             uniqueId = getSavedUUID()
