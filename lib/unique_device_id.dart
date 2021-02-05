@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/services.dart';
 
 class UniqueDeviceId {
@@ -9,8 +11,10 @@ class UniqueDeviceId {
 
   UniqueDeviceId._();
 
-  Future<void> setUseInternalStorageForAndroid(bool use) =>
-      _channel.invokeMethod('setUseInternalStorageForAndroid', use);
+  Future<void> setUseInternalStorageForAndroid(bool use) async {
+    if (!Platform.isAndroid) return;
+    await _channel.invokeMethod('setUseInternalStorageForAndroid', use);
+  }
 
   Future<String> getUniqueId() => _channel.invokeMethod('getUniqueId');
 }
