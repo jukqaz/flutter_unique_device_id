@@ -4,7 +4,6 @@ import 'package:unique_device_id/unique_device_id.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await UniqueDeviceId.instance.setUseInternalStorageForAndroid(true);
-  debugPrint('### ${await UniqueDeviceId.instance.getUniqueId()}');
 
   runApp(MyApp());
 }
@@ -23,7 +22,11 @@ class _MyAppState extends State<MyApp> {
           title: const Text('Plugin example app'),
         ),
         body: Center(
-          child: Text('Running on: a\n'),
+          child: FutureBuilder(
+            future: UniqueDeviceId.instance.getUniqueId(),
+            builder: (context, snapshot) =>
+                snapshot.hasData ? Text('Unique ID: ${snapshot.data}\n') : CircularProgressIndicator(),
+          ),
         ),
       ),
     );

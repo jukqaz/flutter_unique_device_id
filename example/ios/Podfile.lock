@@ -1,0 +1,29 @@
+PODS:
+  - Flutter (1.0.0)
+  - SwiftKeychainWrapper (4.0.1)
+  - unique_device_id (0.0.1):
+    - Flutter
+    - SwiftKeychainWrapper (~> 4.0)
+
+DEPENDENCIES:
+  - Flutter (from `Flutter`)
+  - unique_device_id (from `.symlinks/plugins/unique_device_id/ios`)
+
+SPEC REPOS:
+  trunk:
+    - SwiftKeychainWrapper
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: Flutter
+  unique_device_id:
+    :path: ".symlinks/plugins/unique_device_id/ios"
+
+SPEC CHECKSUMS:
+  Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
+  SwiftKeychainWrapper: 807ba1d63c33a7d0613288512399cd1eda1e470c
+  unique_device_id: 6e667cdea359c527beabb26a0cfd7a607afd7816
+
+PODFILE CHECKSUM: a75497545d4391e2d394c3668e20cfb1c2bbd4aa
+
+COCOAPODS: 1.10.1
