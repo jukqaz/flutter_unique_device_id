@@ -1,15 +1,17 @@
 # unique_device_id
 
-A new flutter plugin project.
+Get unique device id
 
 ## Getting Started
-
-This project is a starting point for a Flutter
-[plug-in package](https://flutter.dev/developing-packages/),
-a specialized package that includes platform-specific implementation code for
-Android and/or iOS.
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
-
+1. getUniqueId()
+   - Get unique device id (if id does not exist, generate and save uuid)
+      - Android: SSAID
+      - iOS: identifierForVendor<br>
+`
+  UniqueDeviceId.instance.getUniqueId()
+`
+2. setUseInternalStorageForAndroid(bool use)
+   - If SSAID does not exist, save internal storage<br>
+`
+  await UniqueDeviceId.instance.setUseInternalStorageForAndroid(true);
+`
