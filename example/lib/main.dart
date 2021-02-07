@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:unique_device_id/unique_device_id.dart';
 
 void main() async {
@@ -13,6 +14,19 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  String uniqueId;
+
+  @override
+  void initState() {
+    super.initState();
+
+    getUniqueId().then(
+      (value) => setState(
+        () => uniqueId = value,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -21,13 +35,23 @@ class _MyAppState extends State<MyApp> {
           title: const Text('Plugin example app'),
         ),
         body: Center(
-          child: FutureBuilder(
-            future: UniqueDeviceId.instance.getUniqueId(),
-            builder: (context, snapshot) =>
-                snapshot.hasData ? Text('Unique ID: ${snapshot.data}\n') : CircularProgressIndicator(),
-          ),
+          child: uniqueId?.isNotEmpty ?? false ? Text('Unique ID: $uniqueId\n') : CircularProgressIndicator(),
         ),
       ),
     );
+  }
+
+  Future<String> getUniqueId() async {
+    try {
+      return await UniqueDeviceId.instance.getUniqueId();
+    } catch (e) {
+      final status = await Permission.storage.request();
+      if (status.isGranted) {
+        return getUniqueId();
+      } else if (status.isPermanentlyDenied) {
+        openAppSettings();
+      }
+      rethrow;
+    }
   }
 }
