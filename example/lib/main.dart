@@ -3,7 +3,6 @@ import 'package:unique_device_id/unique_device_id.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await UniqueDeviceId.instance.setUseInternalStorageForAndroid(true);
 
   runApp(MyApp());
 }

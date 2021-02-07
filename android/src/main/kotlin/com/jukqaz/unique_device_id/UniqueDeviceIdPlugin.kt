@@ -9,6 +9,10 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.*
 
@@ -16,7 +20,6 @@ import java.util.*
 class UniqueDeviceIdPlugin : FlutterPlugin, MethodCallHandler {
     private lateinit var channel: MethodChannel
     private var context: Context? = null
-    private var useInternalStorageForAndroid = false
 
     private val uuidFilePath
         get() = context?.externalCacheDir?.path + "/unique_device_id"
@@ -28,15 +31,14 @@ class UniqueDeviceIdPlugin : FlutterPlugin, MethodCallHandler {
         context = flutterPluginBinding.applicationContext
     }
 
-    override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) =
+    override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
         when (call.method) {
-            "setUseInternalStorageForAndroid" -> {
-                useInternalStorageForAndroid = (call.arguments as? Boolean?) ?: false
-                result.success(null)
+            "getUniqueId" -> CoroutineScope(Dispatchers.Main).launch {
+                result.success(getUniqueId())
             }
-            "getUniqueId" -> result.success(getUniqueId())
             else -> result.notImplemented()
         }
+    }
 
     override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
         channel.setMethodCallHandler(null)
@@ -44,16 +46,15 @@ class UniqueDeviceIdPlugin : FlutterPlugin, MethodCallHandler {
         context = null
     }
 
-    private fun getUniqueId(): String? {
+    private suspend fun getUniqueId(): String? {
         var uniqueId: String? = getAndroidId()
         if (uniqueId?.isBlank() == true) {
-            if (!useInternalStorageForAndroid) return null
             uniqueId = getSavedUUID()
         }
         return uniqueId
     }
 
-    private fun getSavedUUID(): String {
+    private suspend fun getSavedUUID(): String {
         var uuid = readUUIDFromInternalStorage()
         if (uuid?.isBlank() != false) {
             uuid = UUID.randomUUID().toString()
@@ -62,11 +63,13 @@ class UniqueDeviceIdPlugin : FlutterPlugin, MethodCallHandler {
         return uuid
     }
 
-    private fun readUUIDFromInternalStorage() =
+    private suspend fun readUUIDFromInternalStorage() = withContext(Dispatchers.IO) {
         File(uuidFilePath).takeIf { it.exists() }?.readText(Charsets.UTF_8)
+    }
 
-    private fun writeUUIDToInternalStorage(uuid: String) =
+    private suspend fun writeUUIDToInternalStorage(uuid: String) = withContext(Dispatchers.IO) {
         File(uuidFilePath).writeText(uuid, Charsets.UTF_8)
+    }
 
     @SuppressLint("HardwareIds")
     private fun getAndroidId() = context?.run {
