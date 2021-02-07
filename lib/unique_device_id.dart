@@ -9,5 +9,10 @@ class UniqueDeviceId {
 
   UniqueDeviceId._();
 
+  ///
+  /// Get unique id
+  ///
+  /// - Android: SSAID, fallback saved random UUID
+  /// - iOS: identifierForVendor
   Future<String> getUniqueId() => _channel.invokeMethod('getUniqueId');
 }

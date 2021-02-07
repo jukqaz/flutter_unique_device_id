@@ -10,8 +10,3 @@ Get unique device id
 `
   UniqueDeviceId.instance.getUniqueId()
 `
-2. setUseInternalStorageForAndroid(bool use)
-   - If SSAID does not exist, save internal storage<br>
-`
-  await UniqueDeviceId.instance.setUseInternalStorageForAndroid(true);
-`

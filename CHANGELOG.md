@@ -11,3 +11,6 @@
 * refactor: remove setUseInternalStorageForAndroid function
 * fix: change null check condition
 * feat: apply coroutine
+
+## 0.0.4
+* doc: add api docs
