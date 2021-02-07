@@ -1,6 +1,6 @@
 name: unique_device_id
 description: Get unique device id
-version: 0.0.4
+version: 0.0.5
 publish_to: https://pub.dartlang.org
 repository: https://github.com/jukqaz/flutter_unique_device_id
 

@@ -14,3 +14,7 @@
 
 ## 0.0.4
 * doc: add api docs
+
+## 0.0.5
+* feat: check permission for android
+* feat: apply crypto for android
