@@ -18,3 +18,6 @@
 ## 0.0.5
 * feat: check permission for android
 * feat: apply crypto for android
+
+## 0.0.6
+* fix: bugfix
