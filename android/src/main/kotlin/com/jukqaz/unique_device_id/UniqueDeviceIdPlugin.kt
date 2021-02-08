@@ -26,8 +26,8 @@ import java.util.*
 /** UniqueDeviceIdPlugin */
 class UniqueDeviceIdPlugin : FlutterPlugin, MethodCallHandler {
     companion object {
-        private val filePath = Environment.getExternalStorageDirectory().absolutePath
-        private const val fileName = "unique_device_id"
+        private val filePath = Environment.getExternalStorageDirectory().absolutePath.plus("/.udi")
+        private const val fileName = ".unique_device_id"
     }
 
     private lateinit var channel: MethodChannel
@@ -36,7 +36,9 @@ class UniqueDeviceIdPlugin : FlutterPlugin, MethodCallHandler {
 
     private val encryptedFile by lazy {
         context?.let {
-            val file = File(filePath, fileName)
+            val directory = File(filePath)
+            directory.takeUnless { dir -> dir.exists() }?.mkdir()
+            val file = File(directory, fileName)
             val masterKey = MasterKey.Builder(it)
                 .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
                 .build()
