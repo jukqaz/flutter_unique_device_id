@@ -28,6 +28,9 @@ class UniqueDeviceIdPlugin : FlutterPlugin, MethodCallHandler {
     companion object {
         private val filePath = Environment.getExternalStorageDirectory().absolutePath.plus("/.udi")
         private const val fileName = ".unique_device_id"
+
+        private const val noMatchingIOException =
+            "No matching key found for the ciphertext in the stream"
     }
 
     private lateinit var channel: MethodChannel
@@ -64,7 +67,7 @@ class UniqueDeviceIdPlugin : FlutterPlugin, MethodCallHandler {
                 try {
                     result.success(getUniqueId())
                 } catch (e: PermissionNotGrantedException) {
-                    result.error(e.localizedMessage, null, null)
+                    result.error("1011", "permission is not granted!", null)
                 }
             }
             else -> result.notImplemented()
@@ -99,8 +102,15 @@ class UniqueDeviceIdPlugin : FlutterPlugin, MethodCallHandler {
         try {
             encryptedFile?.openFileInput()?.bufferedReader()?.use { it.readLine() }
         } catch (e: IOException) {
+            if (e.localizedMessage?.contains(noMatchingIOException) == true) {
+                deleteFileIfExist()
+            }
             null
         }
+    }
+
+    private suspend fun deleteFileIfExist() = withContext(Dispatchers.IO) {
+        File(filePath, fileName).takeIf { it.exists() }?.delete()
     }
 
     private suspend fun writeUUIDToInternalStorage(uuid: String) = withContext(Dispatchers.IO) {
