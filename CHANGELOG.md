@@ -21,3 +21,6 @@
 
 ## 0.0.6
 * fix: bugfix
+
+## 0.0.7
+* feat: add error code (permission)

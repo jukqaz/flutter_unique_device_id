@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:unique_device_id/unique_device_id.dart';
 
@@ -44,14 +45,16 @@ class _MyAppState extends State<MyApp> {
   Future<String> getUniqueId() async {
     try {
       return await UniqueDeviceId.instance.getUniqueId();
-    } catch (e) {
-      final status = await Permission.storage.request();
-      if (status.isGranted) {
-        return getUniqueId();
-      } else if (status.isPermanentlyDenied) {
-        openAppSettings();
+    } on PlatformException catch (e) {
+      if (e.code == '1011') {
+        final status = await Permission.storage.request();
+        if (status.isGranted) {
+          return getUniqueId();
+        } else if (status.isPermanentlyDenied) {
+          openAppSettings();
+        }
       }
-      rethrow;
+      return null;
     }
   }
 }
