@@ -4,6 +4,7 @@ import UIKit
 
 public class SwiftUniqueDeviceIdPlugin: NSObject, FlutterPlugin {
   let savedUniqueIdKey = "UniqueId"
+  var isDefaultUseUUID = false
 
   public static func register(with registrar: FlutterPluginRegistrar) {
     let channel = FlutterMethodChannel(name: "unique_device_id", binaryMessenger: registrar.messenger())
@@ -13,6 +14,9 @@ public class SwiftUniqueDeviceIdPlugin: NSObject, FlutterPlugin {
 
   public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
     switch call.method {
+    case "setDefaultUseUUID":
+      isDefaultUseUUID = (call.arguments as? Bool) ?? false
+      result(nil)
     case "getUniqueId":
       result(getUniqueId())
     default:
@@ -22,7 +26,7 @@ public class SwiftUniqueDeviceIdPlugin: NSObject, FlutterPlugin {
 
   private func getUniqueId() -> String? {
     guard let saveUniqueId = KeychainWrapper.standard.string(forKey: savedUniqueIdKey), !saveUniqueId.isEmpty else {
-      guard let uuid = UIDevice.current.identifierForVendor?.uuidString, !uuid.isEmpty else {
+      guard let uuid = UIDevice.current.identifierForVendor?.uuidString, !isDefaultUseUUID, !uuid.isEmpty else {
         let generateUUID = UUID().uuidString
         setUUIDIntoKeychain(uuid: generateUUID)
         return generateUUID

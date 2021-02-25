@@ -7,8 +7,6 @@ import android.content.pm.PackageManager
 import android.os.Environment
 import android.provider.Settings
 import androidx.annotation.NonNull
-import androidx.security.crypto.EncryptedFile
-import androidx.security.crypto.MasterKey
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -19,39 +17,27 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
-import java.io.IOException
 import java.util.*
-
 
 /** UniqueDeviceIdPlugin */
 class UniqueDeviceIdPlugin : FlutterPlugin, MethodCallHandler {
     companion object {
         private val filePath = Environment.getExternalStorageDirectory().absolutePath.plus("/.udi")
         private const val fileName = ".unique_device_id"
-
-        private const val noMatchingIOException =
-            "No matching key found for the ciphertext in the stream"
+        private val defaultSecretKey = UniqueDeviceIdPlugin::class.java.simpleName
     }
 
     private lateinit var channel: MethodChannel
     private var context: Context? = null
 
+    private var aesUtil: AESUtil? = null
+    private var secretKey = defaultSecretKey
+    private var isDefaultUseUUID = false
 
-    private val encryptedFile by lazy {
-        context?.let {
-            val directory = File(filePath)
-            directory.takeUnless { dir -> dir.exists() }?.mkdir()
-            val file = File(directory, fileName)
-            val masterKey = MasterKey.Builder(it)
-                .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-                .build()
-            EncryptedFile.Builder(
-                it,
-                file,
-                masterKey,
-                EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB
-            ).build()
-        }
+    private val uuidFile by lazy {
+        val directory = File(filePath)
+        directory.takeUnless { dir -> dir.exists() }?.mkdir()
+        File(directory, fileName)
     }
 
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
@@ -63,6 +49,14 @@ class UniqueDeviceIdPlugin : FlutterPlugin, MethodCallHandler {
 
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
         when (call.method) {
+            "setSecretKey" -> {
+                secretKey = (call.arguments as? String?) ?: defaultSecretKey
+                result.success(null)
+            }
+            "setDefaultUseUUID" -> {
+                isDefaultUseUUID = (call.arguments as? Boolean?) ?: false
+                result.success(null)
+            }
             "getUniqueId" -> CoroutineScope(Dispatchers.Main).launch {
                 try {
                     result.success(getUniqueId())
@@ -81,7 +75,7 @@ class UniqueDeviceIdPlugin : FlutterPlugin, MethodCallHandler {
     }
 
     private suspend fun getUniqueId(): String {
-        var uniqueId: String? = getAndroidId()
+        var uniqueId: String? = if (isDefaultUseUUID) null else getAndroidId()
         if (uniqueId?.isBlank() != false) {
             uniqueId = getSavedUUID()
         }
@@ -89,6 +83,9 @@ class UniqueDeviceIdPlugin : FlutterPlugin, MethodCallHandler {
     }
 
     private suspend fun getSavedUUID(): String {
+        if (aesUtil?.key != secretKey)
+            aesUtil = AESUtil(secretKey)
+
         var uuid = readUUIDFromInternalStorage()
         if (uuid?.isBlank() != false) {
             uuid = UUID.randomUUID().toString()
@@ -100,24 +97,17 @@ class UniqueDeviceIdPlugin : FlutterPlugin, MethodCallHandler {
     private suspend fun readUUIDFromInternalStorage() = withContext(Dispatchers.IO) {
         if (!checkExternalStoragePermission()) throw PermissionNotGrantedException()
         try {
-            encryptedFile?.openFileInput()?.bufferedReader()?.use { it.readLine() }
-        } catch (e: IOException) {
-            if (e.localizedMessage?.contains(noMatchingIOException) == true) {
-                deleteFileIfExist()
-            }
+            uuidFile.bufferedReader().use { aesUtil?.decode(it.readLine()) }
+        } catch (e: Exception) {
             null
         }
-    }
-
-    private suspend fun deleteFileIfExist() = withContext(Dispatchers.IO) {
-        File(filePath, fileName).takeIf { it.exists() }?.delete()
     }
 
     private suspend fun writeUUIDToInternalStorage(uuid: String) = withContext(Dispatchers.IO) {
         if (!checkExternalStoragePermission()) throw PermissionNotGrantedException()
         try {
-            encryptedFile?.openFileOutput()?.bufferedWriter().use { it?.write(uuid) }
-        } catch (e: IOException) {
+            uuidFile.bufferedWriter().use { it.write((aesUtil?.encode(uuid))) }
+        } catch (e: Exception) {
             null
         }
     }
