@@ -57,9 +57,15 @@
       <section class="desc markdown">
         <h1 id="unique_device_id">unique_device_id</h1>
 <p>Get unique device id</p>
+<h2 id="notice-for-android">Notice for android</h2>
+<ol>
+<li>Require minSdk 23, WRITE_EXTERNAL_STORAGE permission</li>
+<li>If SSAID cannot be retrieved, a random UUID can be generated and stored in an encrypted file for use. </li>
+</ol>
 <h2 id="getting-started">Getting Started</h2>
 <ol>
-<li>getUniqueId()
+<li>
+<p>getUniqueId()</p>
 <ul>
 <li>Get unique device id (if id does not exist, generate and save uuid)
 <ul>
@@ -68,6 +74,20 @@
 <code>UniqueDeviceId.instance.getUniqueId()</code></li>
 </ul>
 </li>
+</ul>
+</li>
+<li>
+<p>setDefaultUseUUID()</p>
+<ul>
+<li>Use UUID instead of SSAID(Android), identifierForVendor(iOS)<br>
+<code>UniqueDeviceId.instance.setDefaultUseUUID(bool)</code></li>
+</ul>
+</li>
+<li>
+<p>setSecretKey()</p>
+<ul>
+<li>Set android crypto secret key (require over 16 digits)<br>
+<code>UniqueDeviceId.instance.setSecretKey(String)</code></li>
 </ul>
 </li>
 </ol>
@@ -95,7 +115,7 @@
 <footer>
   <span class="no-break">
     unique_device_id
-      0.0.3
+      0.0.8
   </span>
 
 </footer>

@@ -24,3 +24,7 @@
 
 ## 0.0.7
 * feat: add error code (permission)
+
+## 0.0.8
+* feat use default UUID
+  * Android: remove android security library

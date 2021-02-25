@@ -14,3 +14,15 @@ Get unique device id
 `
   UniqueDeviceId.instance.getUniqueId()
 `
+
+2. setDefaultUseUUID()
+   - Use UUID instead of SSAID(Android), identifierForVendor(iOS)<br>
+`
+  UniqueDeviceId.instance.setDefaultUseUUID(bool)
+`
+
+3. setSecretKey()
+   - Set android crypto secret key (require over 16 digits)<br>
+`
+  UniqueDeviceId.instance.setSecretKey(String)
+`
