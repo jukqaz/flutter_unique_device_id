@@ -1,9 +1,9 @@
 name: unique_device_id
 description: >
   Get unique device id For Android/iOS
-  Android: SSAID, iOS: identifierForVendor
-  Alternative, UUID
-version: 0.0.8
+  Android(SSAID), iOS(dentifierForVendor)
+  alternative, UUID
+version: 0.0.9
 publish_to: https://pub.dartlang.org
 repository: https://github.com/jukqaz/flutter_unique_device_id
 

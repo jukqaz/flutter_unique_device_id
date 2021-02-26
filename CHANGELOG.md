@@ -28,3 +28,6 @@
 ## 0.0.8
 * feat use default UUID
   * Android: remove android security library
+
+## 0.0.9
+* chore: apply formatting
