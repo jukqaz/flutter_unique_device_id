@@ -37,8 +37,10 @@ class _MyAppState extends State<MyApp> {
         appBar: AppBar(
           title: const Text('Plugin example app'),
         ),
-        body: Center(
-          child: uniqueId?.isNotEmpty ?? false ? Text('Unique ID: $uniqueId\n') : CircularProgressIndicator(),
+        body: Center( 
+          child: uniqueId?.isNotEmpty ?? false
+              ? Text('Unique ID: $uniqueId\n')
+              : CircularProgressIndicator(),
         ),
       ),
     );

@@ -25,7 +25,8 @@ class UniqueDeviceId {
   ///
   /// Use default UUID
   ///
-  Future<void> setDefaultUseUUID(bool use) => _channel.invokeMethod('setDefaultUseUUID', use);
+  Future<void> setDefaultUseUUID(bool use) =>
+      _channel.invokeMethod('setDefaultUseUUID', use);
 
   ///
   /// Get unique id
