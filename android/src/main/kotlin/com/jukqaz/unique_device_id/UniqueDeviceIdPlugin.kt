@@ -24,7 +24,7 @@ class UniqueDeviceIdPlugin : FlutterPlugin, MethodCallHandler {
     companion object {
         private val filePath = Environment.getExternalStorageDirectory().absolutePath.plus("/.udi")
         private const val fileName = ".unique_device_id"
-        private val defaultSecretKey = UniqueDeviceIdPlugin::class.java.simpleName
+        private val defaultSecretKey = "UniqueDeviceIdPlugin"
     }
 
     private lateinit var channel: MethodChannel

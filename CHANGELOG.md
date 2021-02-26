@@ -31,3 +31,6 @@
 
 ## 0.0.9
 * chore: apply formatting
+
+## 0.1.0
+* fix: modify default secret key
